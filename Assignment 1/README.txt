@@ -1,0 +1,1 @@
+This project consisted of extracting information from a relational database hosted in Udacity using SQL. The database has different datasets for students to explore.  From the data, I had to gather some insights to report certain questions regarding the dataset.

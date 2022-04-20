@@ -1,0 +1,72 @@
+-- Query for Slide 1 (adjusted from Question Set 1 Question 1)
+
+SELECT  f.title,
+        c.name category,
+        count(rental_id) as rental_count
+FROM rental r
+JOIN inventory i
+  ON r.inventory_id = i.inventory_id
+JOIN film f
+  ON i.film_id = f.film_id
+JOIN film_category fc
+  ON f.film_id = fc.film_id
+JOIN category c
+  ON fc.category_id = c.category_id
+WHERE c.name in ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+GROUP BY 1,2
+ORDER BY 3 DESC
+LIMIT 10;
+
+-- Query for Slide 2 (from Question Set 1 Question 3)
+
+WITH t2 AS (SELECT  f.title title,
+                    c.name category,
+                    f.rental_duration,
+                    NTILE(4) OVER (ORDER BY f.rental_duration) as standard_quartile
+            FROM film f
+            JOIN film_category fc
+              ON f.film_id = fc.film_id
+            JOIN category c
+              ON fc.category_id = c.category_id
+            WHERE c.name in ('Animation', 'Children', 'Classics', 'Comedy', 'Family', 'Music')
+SELECT t2.category, t2.standard_quartile, count(t2.title)
+FROM t2
+GROUP BY 1,2
+ORDER BY 1,2;
+
+-- Query for Slide 3 (from Question Set 2 Question 1)
+
+SELECT
+	DATE_PART('month',rental_date) rental_month,
+	DATE_PART('year',rental_date) rental_year,
+	s.store_id,
+  count(rental_id) count_rentals
+FROM staff s
+JOIN rental r
+	ON r.staff_id = s.staff_id
+GROUP BY 1, 2, 3
+ORDER BY 4 DESC;
+
+-- Query for Slide 4 (from Question Set 2 Question 2)
+
+WITH t1 as (SELECT  c.customer_id,
+                    c.first_name || ' ' || c.last_name as customer_name,
+                    sum(p.amount) payment_amount
+            FROM payment p
+            JOIN customer c
+              ON p.customer_id = c.customer_id
+            GROUP BY 2, 1
+            ORDER BY 3 DESC
+            LIMIT 10)
+SELECT  DATE_TRUNC('year', p.payment_date) payment_year,
+        t1.customer_name, count(*) as payment_count,
+        sum(p.amount) payment_amount
+FROM payment p
+JOIN customer c
+  ON p.customer_id = c.customer_id
+JOIN t1
+  ON t1.customer_id = c.customer_id
+WHERE p.payment_date BETWEEN '2007-01-01' AND '2008-01-01' AND
+      p.customer_id = t1.customer_id
+GROUP BY 1, 2
+ORDER BY 2;

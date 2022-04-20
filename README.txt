@@ -1,0 +1,1 @@
+These folders are for each of the assignments I completed in early 2021 in Udacity's Programming for Data Science with Python Nanodegree Program. Each of the folders has a read-me file describing roughly what the assignment was about and what it entailed.
